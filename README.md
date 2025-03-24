@@ -37,7 +37,7 @@ Then, download the meta-learned encoder and detector models from [here](https://
 
 
 ### 2. Fine-Tune
-#### Pokemon encoder & decoder
+#### Pokemon Encoder & Decoder
 For your convenience, we directly provide a fine-tuned encoder and decoder on the Pokémon dataset, allowing you to obtain them from [here](https://www.dropbox.com/scl/fo/hr9c2y0a2kcujyqdgamm4/AIxk2wmF074xbf756guoONs?rlkey=d5vzavlvcitax005vlykty5e9&st=y4mngear&dl=0).
 
 #### Fine-Tuned Diffusion Model
