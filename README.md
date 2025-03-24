@@ -37,8 +37,84 @@ Then, download the meta-learned encoder and detector models from [here](https://
 
 
 ### 2. Fine-Tune
+#### Pokemon Encoder & Decoder
+For your convenience, we directly provide a fine-tuned encoder and decoder on the Pokémon dataset, allowing you to obtain them from [here](https://www.dropbox.com/scl/fo/hr9c2y0a2kcujyqdgamm4/AIxk2wmF074xbf756guoONs?rlkey=d5vzavlvcitax005vlykty5e9&st=y4mngear&dl=0).
+
 #### Fine-Tuned Diffusion Model
-You need to train a personalized diffusion model before fine-tuning encoder and decoder. You can train this diffusion model using the code [here](https://github.com/kohya-ss/sd-scripts).
+You need to train a personalized diffusion model before fine-tuning encoder and decoder. You can train this diffusion model using the webui's code [here](https://github.com/kohya-ss/sd-scripts).
+We will provide scripts for training on the Pokémon and CelebA datasets.
+
+##### Pokémon
+Training scripts: 
+```
+accelerate launch --gpu_ids='GPU_ID'  train_network.py \
+    --pretrained_model_name_or_path="runwayml/stable-diffusion-v1-5" \
+    --dataset_config="pokemon.toml" \
+    --output_dir="OUTPUT_PATH" \
+    --output_name="OUTPUT_NAME" \
+    --save_model_as=safetensors \
+    --prior_loss_weight=1.0 \
+    --max_train_epochs=80 \
+    --learning_rate=1e-4 \
+    --optimizer_type="AdamW" \
+    --mixed_precision="fp16" \
+    --save_every_n_epochs=20 \
+    --network_module=networks.lora \
+    --network_dim=64 \
+    --gradient_checkpointing \
+    --gradient_accumulation_steps=1 \
+    --cache_latents
+```
+You also need a dataset parameter file pokemon.toml:
+```
+[general]
+enable_bucket = true                        # Whether to use Aspect Ratio Bucketing
+
+[[datasets]]
+resolution = 512                            # Training resolution
+batch_size = 4                              # Batch size
+
+  [[datasets.subsets]]
+  image_dir = 'IMAGE_DATASET_PATH'                     # Specify the folder containing the training images
+  caption_extension = '.txt'            # Caption file extension; change this if using .txt
+  num_repeats = 1                          # Number of repetitions for training images
+```
+
+##### CelebA
+Training scripts: 
+```
+accelerate launch --gpu_ids='GPU_ID'  train_network.py \
+    --pretrained_model_name_or_path="runwayml/stable-diffusion-v1-5" \
+    --dataset_config="celeba.toml" \
+    --output_dir="OUTPUT_PATH" \
+    --output_name="OUTPUT_NAME" \
+    --save_model_as=safetensors \
+    --prior_loss_weight=1.0 \
+    --max_train_epochs=80 \
+    --learning_rate=1e-4 \
+    --optimizer_type="AdamW" \
+    --mixed_precision="fp16" \
+    --save_every_n_epochs=20 \
+    --network_module=networks.lora \
+    --network_dim=64 \
+    --gradient_checkpointing \
+    --gradient_accumulation_steps=1 \
+    --cache_latents
+```
+You also need a dataset parameter file celeba.toml:
+```
+[general]
+enable_bucket = true                        # Whether to use Aspect Ratio Bucketing
+
+[[datasets]]
+resolution = 512                            # Training resolution
+batch_size = 4                              # Batch size
+
+  [[datasets.subsets]]
+  image_dir = 'IMAGE_DATASET_PATH'                     # Specify the folder containing the training images
+  caption_extension = '.txt'            # Caption file extension; change this if using .txt
+  num_repeats = 1                          # Number of repetitions for training images
+```
 
 #### Run Command
 Take pokemon as an example, you can perform fine-tuning by running the following command:
@@ -56,6 +132,7 @@ accelerate launch --gpu_ids='GPU_ID' fine_tune.py \
     --encoder_checkpoint "MATE_ENCODER_PATH" \
     --is_diffuser
 ```
+Please note that the ```lora_path``` here refers to the LoRA obtained from the previous Fine-Tuned Diffusion Model.
 
 ### 3. Coating
 #### Local Datasets
